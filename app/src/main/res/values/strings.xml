@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Life is Easy</string>
+    <string name="password">Password</string>
+    <string name="login">Login</string>
+    <string name="register">Register</string>
+    <string name="studentid">StudentID</string>
+    <string name="life_is_easy">Life is Easy</string>
+</resources>
