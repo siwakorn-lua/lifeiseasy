@@ -6,6 +6,19 @@
     android:layout_height="match_parent"
     tools:context=".HomeActivity">
 
+    <TextView
+        android:id="@+id/header"
+        android:layout_width="0dp"
+        android:layout_height="56dp"
+        android:background="@color/colorPrimary"
+        android:gravity="center"
+        android:text="Home"
+        android:textColor="@android:color/white"
+        android:textSize="24sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <Spinner
         android:id="@+id/jobSpinner"
         android:layout_width="0dp"
@@ -16,7 +29,7 @@
         app:layout_constraintEnd_toStartOf="@+id/searchButton"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/header" />
 
     <Button
         android:id="@+id/searchButton"
@@ -26,11 +39,11 @@
         android:layout_marginEnd="8dp"
         android:text="Button"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/header" />
 
     <ScrollView
-        android:layout_width="395dp"
-        android:layout_height="657dp"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
