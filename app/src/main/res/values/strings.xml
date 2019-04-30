@@ -1,4 +1,29 @@
 <resources>
     <string name="app_name">Life is Easy</string>
     <string name="login">Login with Chula ID</string>
+    <string name="password">Password</string>
+    <string name="register">Register</string>
+    <string name="studentid">StudentID</string>
+    <string-array name="jobList">
+        <item>All</item>
+        <item>Application</item>
+        <item>Architecture &amp; Interior</item>
+        <item>Art &amp; Drawing</item>
+        <item>Artist</item>
+        <item>Business</item>
+        <item>Content &amp; Writing</item>
+        <item>Design</item>
+        <item>Graphic Design</item>
+        <item>Influenver</item>
+        <item>Language</item>
+        <item>Lifestyle</item>
+        <item>Marketing Plan</item>
+        <item>Marketing Strategy</item>
+        <item>Photo &amp; Video</item>
+        <item>Self Improvement</item>
+        <item>Social Media</item>
+        <item>Technical</item>
+        <item>Voice &amp; Sound</item>
+        <item>Website Development</item>
+    </string-array>
 </resources>
