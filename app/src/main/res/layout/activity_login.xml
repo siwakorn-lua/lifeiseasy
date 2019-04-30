@@ -31,35 +31,11 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <EditText
-            android:id="@+id/usernameField"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/studentid"
-            android:inputType="number"
-            android:importantForAutofill="no" />
-
-        <EditText
-            android:id="@+id/passwordField"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:hint="@string/password"
-            android:inputType="textPassword"
-            android:importantForAutofill="no" />
-
         <Button
             android:id="@+id/loginButton"
             android:layout_width="300dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:text="@string/login" />
-
-        <Button
-            android:id="@+id/registerButton"
-            android:layout_width="300dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="@string/register" />
     </LinearLayout>
 </android.support.constraint.ConstraintLayout>
