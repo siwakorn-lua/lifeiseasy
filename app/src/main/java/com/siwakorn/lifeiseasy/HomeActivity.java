@@ -1,5 +1,6 @@
 package com.siwakorn.lifeiseasy;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -54,6 +55,13 @@ public class HomeActivity extends Fragment {
                 job = v.findViewById(R.id.job);
                 price = v.findViewById(R.id.price);
                 date = v.findViewById(R.id.date);
+                v.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(getContext(), EmployActivity.class);
+                        startActivity(intent);
+                    }
+                });
             }
         }
 
