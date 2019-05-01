@@ -28,7 +28,7 @@ public class Login2Activity extends AppCompatActivity {
         setContentView(R.layout.activity_login2);
 
         Uri uri = getIntent().getData();
-        String ticket = uri.getQueryParameter("ticket");
+        final String ticket = uri.getQueryParameter("ticket");
         Log.i("debug", ticket);
 
         String url = "http://54.179.153.2:9000/login?ticket="+ticket;
@@ -43,8 +43,14 @@ public class Login2Activity extends AppCompatActivity {
                 public void onResponse(JSONObject response) {
                     Log.i("test",response.toString());
                     SharedPreferences sp = getSharedPreferences("auth", Context.MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sp.edit();
+                    editor.putString("ticket",ticket);
+                    editor.apply();
+
                     Intent home = new Intent(Login2Activity.this, MainActivity.class);
+                    home.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_TASK_ON_HOME);
                     startActivity(home);
+                    finish();
                 }
             },
             new Response.ErrorListener() {
