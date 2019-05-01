@@ -1,6 +1,8 @@
 package com.siwakorn.lifeiseasy;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -9,14 +11,31 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.Volley;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class HomeActivity extends Fragment {
+
+    private JSONArray allJobs;
+    private String filter = "All";
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -26,25 +45,71 @@ public class HomeActivity extends Fragment {
                 R.array.jobList, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         jobSpinner.setAdapter(adapter);
-        RecyclerView jobListRecycler = view.findViewById(R.id.jobListRecycler);
+        jobSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                filter = parent.getItemAtPosition(position).toString();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+        final RecyclerView jobListRecycler = view.findViewById(R.id.jobListRecycler);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         jobListRecycler.setLayoutManager(layoutManager);
-        List<List<String>> initialData = new ArrayList<>();
-        List<String> data = new ArrayList<>();
-        data.add("Somchai Hahaha");
-        data.add("Application");
-        data.add("500");
-        data.add("16/08/2019");
-        for (int i = 0; i < 10; i++) {
-            initialData.add(data);
-        }
-        RecyclerView.Adapter recyclerAdapter = new MyAdapter(initialData);
-        jobListRecycler.setAdapter(recyclerAdapter);
+        SharedPreferences sharedPreferences = getContext().getSharedPreferences("auth", Context.MODE_PRIVATE);
+        String ticket = sharedPreferences.getString("ticket", "");
+        RequestQueue requestQueue = Volley.newRequestQueue(getContext());
+        String url = "http://54.179.153.2:9000/job?ticket=" + ticket;
+        JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET,
+                url,
+                new Response.Listener<JSONArray>() {
+                    @Override
+                    public void onResponse(JSONArray response) {
+                        allJobs = response;
+                        RecyclerView.Adapter recyclerAdapter = new MyAdapter(allJobs);
+                        jobListRecycler.setAdapter(recyclerAdapter);
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+
+                    }
+                });
+        requestQueue.add(jsonArrayRequest);
+
+        Button searchButton = view.findViewById(R.id.searchButton);
+        searchButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (filter.equals("All")) {
+                    RecyclerView.Adapter recyclerAdapter = new MyAdapter(allJobs);
+                    jobListRecycler.setAdapter(recyclerAdapter);
+                } else {
+                    JSONArray filteredJobs = new JSONArray();
+                    for (int i = 0; i < allJobs.length(); i++) {
+                        try {
+                            if (allJobs.getJSONObject(i).getString("name").equals(filter)) {
+                                filteredJobs.put(allJobs.getJSONObject(i));
+                            }
+                            RecyclerView.Adapter recyclerAdapter = new MyAdapter(filteredJobs);
+                            jobListRecycler.setAdapter(recyclerAdapter);
+                        } catch (JSONException e1) {
+                            e1.printStackTrace();
+                        }
+                    }
+                }
+            }
+        });
+
         return view;
     }
 
     public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
-        private List<List<String>> mDataset;
+        private JSONArray mDataset;
 
         public class MyViewHolder extends RecyclerView.ViewHolder {
             public TextView name, job, price, date;
@@ -65,7 +130,7 @@ public class HomeActivity extends Fragment {
             }
         }
 
-        public MyAdapter(List<List<String>> myDataset) {
+        public MyAdapter(JSONArray myDataset) {
             mDataset = myDataset;
         }
 
@@ -79,15 +144,24 @@ public class HomeActivity extends Fragment {
 
         @Override
         public void onBindViewHolder(MyViewHolder holder, int position) {
-            holder.name.setText(mDataset.get(position).get(0));
-            holder.job.setText(mDataset.get(position).get(1));
-            holder.price.setText(mDataset.get(position).get(2));
-            holder.date.setText(mDataset.get(position).get(3));
+            try {
+                holder.name.setText(mDataset.getJSONObject(position).getString("provider"));
+                holder.job.setText(mDataset.getJSONObject(position).getString("name"));
+                holder.price.setText(mDataset.getJSONObject(position).getString("price"));
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'00:00:00.000'Z'");
+                Date date = simpleDateFormat.parse(mDataset.getJSONObject(position).getString("date"));
+                SimpleDateFormat outputFormat = new SimpleDateFormat("dd/MM/yyyy");
+                holder.date.setText(outputFormat.format(date));
+            } catch (JSONException e1) {
+                e1.printStackTrace();
+            } catch (ParseException e2) {
+                e2.printStackTrace();
+            }
         }
 
         @Override
         public int getItemCount() {
-            return mDataset.size();
+            return mDataset.length();
         }
     }
 
