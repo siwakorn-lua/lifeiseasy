@@ -112,7 +112,8 @@ public class HomeActivity extends Fragment {
         private JSONArray mDataset;
 
         public class MyViewHolder extends RecyclerView.ViewHolder {
-            public TextView name, job, price, date;
+            private TextView name, job, price, date;
+            private String jobID;
 
             public MyViewHolder(View v) {
                 super(v);
@@ -124,6 +125,11 @@ public class HomeActivity extends Fragment {
                     @Override
                     public void onClick(View v) {
                         Intent intent = new Intent(getContext(), EmployActivity.class);
+                        intent.putExtra("jobID", jobID);
+                        intent.putExtra("name", name.getText().toString());
+                        intent.putExtra("job", job.getText().toString());
+                        intent.putExtra("price", price.getText().toString());
+                        intent.putExtra("date", date.getText().toString());
                         startActivity(intent);
                     }
                 });
@@ -145,6 +151,7 @@ public class HomeActivity extends Fragment {
         @Override
         public void onBindViewHolder(MyViewHolder holder, int position) {
             try {
+                holder.jobID = mDataset.getJSONObject(position).getString("_id");
                 holder.name.setText(mDataset.getJSONObject(position).getString("provider"));
                 holder.job.setText(mDataset.getJSONObject(position).getString("name"));
                 holder.price.setText(mDataset.getJSONObject(position).getString("price"));
