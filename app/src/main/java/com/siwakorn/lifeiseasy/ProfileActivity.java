@@ -1,5 +1,7 @@
 package com.siwakorn.lifeiseasy;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -10,7 +12,21 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class ProfileActivity extends Fragment {
@@ -19,42 +35,70 @@ public class ProfileActivity extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.activity_profile, null);
 
-        RecyclerView jobListRecycler = view.findViewById(R.id.jobListRecycler);
-        jobListRecycler.setHasFixedSize(true);
+        SharedPreferences sharedPreferences = getContext().getSharedPreferences("auth", Context.MODE_PRIVATE);
+        String ticket = sharedPreferences.getString("ticket", "");
+
+        final TextView memberID = view.findViewById(R.id.memberID);
+        final TextView username = view.findViewById(R.id.username);
+        final TextView fullname = view.findViewById(R.id.fullname);
+        final TextView email = view.findViewById(R.id.email);
+
+        final RecyclerView jobListRecycler = view.findViewById(R.id.jobListRecycler);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         jobListRecycler.setLayoutManager(layoutManager);
-        List<List<String>> initialData = new ArrayList<>();
-        List<String> data = new ArrayList<>();
-        data.add("Application");
-        data.add("500");
-        data.add("16/08/2019");
-        for (int i = 0; i < 10; i++) {
-            initialData.add(data);
-        }
-        RecyclerView.Adapter jobAdapter = new jobAdapter(initialData);
-        jobListRecycler.setAdapter(jobAdapter);
 
-        RecyclerView employmentRecycler = view.findViewById(R.id.employmentRecycler);
-        employmentRecycler.setHasFixedSize(true);
+        final RecyclerView employmentRecycler = view.findViewById(R.id.employmentRecycler);
         RecyclerView.LayoutManager layoutManager1 = new LinearLayoutManager(getContext());
         employmentRecycler.setLayoutManager(layoutManager1);
-        List<List<String>> initialData2 = new ArrayList<>();
-        List<String> data2 = new ArrayList<>();
-        data2.add("Somchai Hahaha");
-        data2.add("Application");
-        data2.add("500");
-        data2.add("16/08/2019");
-        for (int i = 0; i < 10; i++) {
-            initialData2.add(data2);
-        }
-        RecyclerView.Adapter employmentAdapter = new employmentAdapter(initialData2);
-        employmentRecycler.setAdapter(employmentAdapter);
+
+        RequestQueue requestQueue = Volley.newRequestQueue(getContext());
+        String url = "http://54.179.153.2:9000/me?ticket=" + ticket;
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET,
+                url,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            JSONObject profile = response.getJSONObject("profile");
+                            memberID.setText(profile.getString("_id"));
+                            username.setText(profile.getString("username"));
+                            fullname.setText(profile.getString("gecos"));
+                            email.setText(profile.getString("email"));
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                        try {
+                            JSONArray job = response.getJSONArray("job");
+                            RecyclerView.Adapter jobAdapter = new jobAdapter(job);
+                            jobListRecycler.setAdapter(jobAdapter);
+                        } catch (JSONException e) {
+
+                        }
+
+                        try {
+                            JSONArray employment = response.getJSONArray("employment");
+                            RecyclerView.Adapter employmentAdapter = new employmentAdapter(employment);
+                            employmentRecycler.setAdapter(employmentAdapter);
+                        } catch (JSONException e) {
+
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+
+                    }
+                });
+
+        requestQueue.add(jsonObjectRequest);
 
         return view;
     }
 
     public class jobAdapter extends RecyclerView.Adapter<jobAdapter.MyViewHolder> {
-        private List<List<String>> mDataset;
+        private JSONArray mDataset;
 
         public class MyViewHolder extends RecyclerView.ViewHolder {
             public TextView name, job, price, date;
@@ -67,7 +111,7 @@ public class ProfileActivity extends Fragment {
             }
         }
 
-        public jobAdapter(List<List<String>> myDataset) {
+        public jobAdapter(JSONArray myDataset) {
             mDataset = myDataset;
         }
 
@@ -81,19 +125,26 @@ public class ProfileActivity extends Fragment {
 
         @Override
         public void onBindViewHolder(jobAdapter.MyViewHolder holder, int position) {
-            holder.job.setText(mDataset.get(position).get(0));
-            holder.price.setText(mDataset.get(position).get(1));
-            holder.date.setText(mDataset.get(position).get(2));
+            try {
+                holder.job.setText(mDataset.getJSONObject(position).getString("name"));
+                holder.price.setText(mDataset.getJSONObject(position).getString("price"));
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'00:00:00.000'Z'");
+                Date date = simpleDateFormat.parse(mDataset.getJSONObject(position).getString("date"));
+                SimpleDateFormat outputFormat = new SimpleDateFormat("dd/MM/yyyy");
+                holder.date.setText(outputFormat.format(date));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
         @Override
         public int getItemCount() {
-            return mDataset.size();
+            return mDataset.length();
         }
     }
 
     public class employmentAdapter extends RecyclerView.Adapter<employmentAdapter.MyViewHolder> {
-        private List<List<String>> mDataset;
+        private JSONArray mDataset;
 
         public class MyViewHolder extends RecyclerView.ViewHolder {
             public TextView name, job, price, date;
@@ -107,7 +158,7 @@ public class ProfileActivity extends Fragment {
             }
         }
 
-        public employmentAdapter(List<List<String>> myDataset) {
+        public employmentAdapter(JSONArray myDataset) {
             mDataset = myDataset;
         }
 
@@ -121,15 +172,22 @@ public class ProfileActivity extends Fragment {
 
         @Override
         public void onBindViewHolder(employmentAdapter.MyViewHolder holder, int position) {
-            holder.name.setText(mDataset.get(position).get(0));
-            holder.job.setText(mDataset.get(position).get(1));
-            holder.price.setText(mDataset.get(position).get(2));
-            holder.date.setText(mDataset.get(position).get(3));
+            try {
+                holder.name.setText(mDataset.getJSONObject(position).getString("provider"));
+                holder.job.setText(mDataset.getJSONObject(position).getString("name"));
+                holder.price.setText(mDataset.getJSONObject(position).getString("price"));
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'00:00:00.000'Z'");
+                Date date = simpleDateFormat.parse(mDataset.getJSONObject(position).getString("date"));
+                SimpleDateFormat outputFormat = new SimpleDateFormat("dd/MM/yyyy");
+                holder.date.setText(outputFormat.format(date));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
         @Override
         public int getItemCount() {
-            return mDataset.size();
+            return mDataset.length();
         }
     }
 
