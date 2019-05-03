@@ -3,13 +3,9 @@ package com.siwakorn.lifeiseasy;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -23,35 +19,34 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class AddJobActivity extends Fragment {
+public class AddJobActivity extends AppCompatActivity {
 
-    private EditText priceField;
+    private EditText priceField, detailField;
     private CalendarView jobDateCalendar;
     private String jobValue, jobDate;
     private Button addButton;
-    private Toast priceNullError;
+    private Toast priceNullError, detailNullError;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.activity_add_job, null);
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_add_job);
 
-        SharedPreferences sharedPreferences = getContext().getSharedPreferences("auth", Context.MODE_PRIVATE);
+        SharedPreferences sharedPreferences = getSharedPreferences("auth", Context.MODE_PRIVATE);
         final String ticket = sharedPreferences.getString("ticket", "");
 
-        priceField = view.findViewById(R.id.priceField);
+        priceField = findViewById(R.id.priceField);
+        detailField = findViewById(R.id.detail);
 
-        jobDateCalendar = view.findViewById(R.id.jobDate);
+        jobDateCalendar = findViewById(R.id.jobDate);
         jobDateCalendar.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
             @Override
             public void onSelectedDayChange(CalendarView view, int year, int month, int dayOfMonth) {
@@ -66,8 +61,8 @@ public class AddJobActivity extends Fragment {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         jobDate = sdf.format(new Date());
 
-        Spinner jobSpinner = view.findViewById(R.id.jobSpinner);
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getContext(),
+        Spinner jobSpinner = findViewById(R.id.jobSpinner);
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
                 R.array.jobListWithoutAll, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         jobSpinner.setAdapter(adapter);
@@ -84,16 +79,17 @@ public class AddJobActivity extends Fragment {
         });
         jobValue = adapter.getItem(0).toString();
 
-        addButton = view.findViewById(R.id.addButton);
+        addButton = findViewById(R.id.addButton);
         addButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!priceField.getText().toString().equals("")) {
-                    RequestQueue requestQueue = Volley.newRequestQueue(getContext());
+                if (!priceField.getText().toString().equals("") && !detailField.getText().toString().equals("")) {
+                    RequestQueue requestQueue = Volley.newRequestQueue(AddJobActivity.this);
                     String url = "http://54.179.153.2:9000/job?ticket=" + ticket;
                     JSONObject postParams = new JSONObject();
                     try {
                         postParams.put("name", jobValue);
+                        postParams.put("detail", detailField.getText().toString());
                         postParams.put("price", priceField.getText().toString());
                         postParams.put("date", jobDate);
                         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST,
@@ -104,10 +100,11 @@ public class AddJobActivity extends Fragment {
                                     public void onResponse(JSONObject response) {
                                         try {
                                             if (response.getBoolean("ok")) {
-                                                Toast.makeText(getContext(), "Success.", Toast.LENGTH_LONG).show();
-                                                Intent intent = new Intent(getContext(), MainActivity.class);
+                                                Toast.makeText(AddJobActivity.this, "Success.", Toast.LENGTH_LONG).show();
+                                                Intent intent = new Intent(AddJobActivity.this, MainActivity.class);
+                                                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                                                 startActivity(intent);
-                                                getActivity().finish();
+                                                finish();
                                             }
                                         } catch (JSONException e) {
                                             e.printStackTrace();
@@ -117,10 +114,11 @@ public class AddJobActivity extends Fragment {
                                 new Response.ErrorListener() {
                                     @Override
                                     public void onErrorResponse(VolleyError error) {
-                                        Toast.makeText(getContext(), "Error, try again.", Toast.LENGTH_LONG).show();
-                                        Intent intent = new Intent(getContext(), MainActivity.class);
+                                        Toast.makeText(AddJobActivity.this, "Error, try again.", Toast.LENGTH_LONG).show();
+                                        Intent intent = new Intent(AddJobActivity.this, MainActivity.class);
+                                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                                         startActivity(intent);
-                                        getActivity().finish();
+                                        finish();
                                     }
                                 });
                         requestQueue.add(jsonObjectRequest);
@@ -128,18 +126,28 @@ public class AddJobActivity extends Fragment {
                         e.printStackTrace();
                     }
                 } else {
-                    if (priceNullError == null) {
-                        priceNullError = Toast.makeText(getContext(), "Please enter the price", Toast.LENGTH_LONG);
-                        priceNullError.show();
-                    } else {
-                        priceNullError.cancel();
-                        priceNullError = Toast.makeText(getContext(), "Please enter the price", Toast.LENGTH_LONG);
-                        priceNullError.show();
+                    if(detailField.getText().toString().equals("")){
+                        if (detailNullError == null) {
+                            detailNullError = Toast.makeText(AddJobActivity.this, "Please enter your job description", Toast.LENGTH_LONG);
+                            detailNullError.show();
+                        } else {
+                            detailNullError.cancel();
+                            detailNullError = Toast.makeText(AddJobActivity.this, "Please enter your job description", Toast.LENGTH_LONG);
+                            detailNullError.show();
+                        }
+                    }else{
+                        if (priceNullError == null) {
+                            priceNullError = Toast.makeText(AddJobActivity.this, "Please enter your price", Toast.LENGTH_LONG);
+                            priceNullError.show();
+                        } else {
+                            priceNullError.cancel();
+                            priceNullError = Toast.makeText(AddJobActivity.this, "Please enter your price", Toast.LENGTH_LONG);
+                            priceNullError.show();
+                        }
                     }
                 }
             }
         });
 
-        return view;
     }
 }

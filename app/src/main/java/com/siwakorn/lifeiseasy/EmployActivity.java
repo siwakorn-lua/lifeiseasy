@@ -32,11 +32,13 @@ public class EmployActivity extends AppCompatActivity {
 
         TextView name = findViewById(R.id.name);
         TextView job = findViewById(R.id.job);
+        TextView detail = findViewById(R.id.jobDescription);
         TextView price = findViewById(R.id.price);
         TextView date = findViewById(R.id.date);
 
         name.setText(extras.getString("name"));
         job.setText(extras.getString("job"));
+        detail.setText(extras.getString("detail"));
         price.setText(extras.getString("price"));
         date.setText(extras.getString("date"));
 

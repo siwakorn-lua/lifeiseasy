@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -105,6 +106,15 @@ public class HomeActivity extends Fragment {
             }
         });
 
+        FloatingActionButton addButton = view.findViewById(R.id.addButton);
+        addButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getContext(), AddJobActivity.class);
+                startActivity(intent);
+            }
+        });
+
         return view;
     }
 
@@ -112,13 +122,14 @@ public class HomeActivity extends Fragment {
         private JSONArray mDataset;
 
         public class MyViewHolder extends RecyclerView.ViewHolder {
-            private TextView name, job, price, date;
+            private TextView name, job, detail, price, date;
             private String jobID;
 
             public MyViewHolder(View v) {
                 super(v);
                 name = v.findViewById(R.id.name);
                 job = v.findViewById(R.id.job);
+                detail = v.findViewById(R.id.jobDescription);
                 price = v.findViewById(R.id.price);
                 date = v.findViewById(R.id.date);
                 v.setOnClickListener(new View.OnClickListener() {
@@ -127,6 +138,7 @@ public class HomeActivity extends Fragment {
                         Intent intent = new Intent(getContext(), EmployActivity.class);
                         intent.putExtra("jobID", jobID);
                         intent.putExtra("name", name.getText().toString());
+                        intent.putExtra("detail", detail.getText().toString());
                         intent.putExtra("job", job.getText().toString());
                         intent.putExtra("price", price.getText().toString());
                         intent.putExtra("date", date.getText().toString());
@@ -154,6 +166,7 @@ public class HomeActivity extends Fragment {
                 holder.jobID = mDataset.getJSONObject(position).getString("_id");
                 holder.name.setText(mDataset.getJSONObject(position).getString("provider"));
                 holder.job.setText(mDataset.getJSONObject(position).getString("name"));
+                holder.detail.setText(mDataset.getJSONObject(position).getString("detail"));
                 holder.price.setText(mDataset.getJSONObject(position).getString("price"));
                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'00:00:00.000'Z'");
                 Date date = simpleDateFormat.parse(mDataset.getJSONObject(position).getString("date"));

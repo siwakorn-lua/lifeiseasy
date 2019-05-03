@@ -29,9 +29,6 @@ public class MainActivity extends AppCompatActivity {
                 case R.id.navigation_home:
                     fragment = new HomeActivity();
                     break;
-                case R.id.navigation_add_job:
-                    fragment = new AddJobActivity();
-                    break;
                 case R.id.navigation_profile:
                     fragment = new ProfileActivity();
                     break;

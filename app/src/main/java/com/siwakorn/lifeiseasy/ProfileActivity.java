@@ -101,11 +101,12 @@ public class ProfileActivity extends Fragment {
         private JSONArray mDataset;
 
         public class MyViewHolder extends RecyclerView.ViewHolder {
-            public TextView name, job, price, date;
+            public TextView name, job, detail, price, date;
 
             public MyViewHolder(View v) {
                 super(v);
                 job = v.findViewById(R.id.job);
+                detail = v.findViewById(R.id.jobDescription);
                 price = v.findViewById(R.id.price);
                 date = v.findViewById(R.id.date);
             }
@@ -127,6 +128,7 @@ public class ProfileActivity extends Fragment {
         public void onBindViewHolder(jobAdapter.MyViewHolder holder, int position) {
             try {
                 holder.job.setText(mDataset.getJSONObject(position).getString("name"));
+                holder.detail.setText(mDataset.getJSONObject(position).getString("detail"));
                 holder.price.setText(mDataset.getJSONObject(position).getString("price"));
                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'00:00:00.000'Z'");
                 Date date = simpleDateFormat.parse(mDataset.getJSONObject(position).getString("date"));
@@ -147,12 +149,13 @@ public class ProfileActivity extends Fragment {
         private JSONArray mDataset;
 
         public class MyViewHolder extends RecyclerView.ViewHolder {
-            public TextView name, job, price, date;
+            public TextView name, job, detail, price, date;
 
             public MyViewHolder(View v) {
                 super(v);
                 name = v.findViewById(R.id.name);
                 job = v.findViewById(R.id.job);
+                detail = v.findViewById(R.id.jobDescription);
                 price = v.findViewById(R.id.price);
                 date = v.findViewById(R.id.date);
             }
@@ -175,6 +178,7 @@ public class ProfileActivity extends Fragment {
             try {
                 holder.name.setText(mDataset.getJSONObject(position).getString("provider"));
                 holder.job.setText(mDataset.getJSONObject(position).getString("name"));
+                holder.detail.setText(mDataset.getJSONObject(position).getString("detail"));
                 holder.price.setText(mDataset.getJSONObject(position).getString("price"));
                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'00:00:00.000'Z'");
                 Date date = simpleDateFormat.parse(mDataset.getJSONObject(position).getString("date"));
