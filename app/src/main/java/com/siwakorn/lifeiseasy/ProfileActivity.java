@@ -101,7 +101,7 @@ public class ProfileActivity extends Fragment {
         private JSONArray mDataset;
 
         public class MyViewHolder extends RecyclerView.ViewHolder {
-            public TextView name, job, detail, price, date;
+            public TextView name, job, detail, price, date, customer;
 
             public MyViewHolder(View v) {
                 super(v);
@@ -109,6 +109,7 @@ public class ProfileActivity extends Fragment {
                 detail = v.findViewById(R.id.jobDescription);
                 price = v.findViewById(R.id.price);
                 date = v.findViewById(R.id.date);
+                customer = v.findViewById(R.id.customer);
             }
         }
 
@@ -134,6 +135,9 @@ public class ProfileActivity extends Fragment {
                 Date date = simpleDateFormat.parse(mDataset.getJSONObject(position).getString("date"));
                 SimpleDateFormat outputFormat = new SimpleDateFormat("dd/MM/yyyy");
                 holder.date.setText(outputFormat.format(date));
+                if(!mDataset.getJSONObject(position).getString("customer").equals("null")) {
+                    holder.customer.setText(mDataset.getJSONObject(position).getString("customer"));
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
