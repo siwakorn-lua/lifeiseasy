@@ -131,7 +131,7 @@ public class ProfileActivity extends Fragment {
                 holder.job.setText(mDataset.getJSONObject(position).getString("name"));
                 holder.detail.setText(mDataset.getJSONObject(position).getString("detail"));
                 holder.price.setText(mDataset.getJSONObject(position).getString("price"));
-                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'00:00:00.000'Z'");
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
                 Date date = simpleDateFormat.parse(mDataset.getJSONObject(position).getString("date"));
                 SimpleDateFormat outputFormat = new SimpleDateFormat("dd/MM/yyyy");
                 holder.date.setText(outputFormat.format(date));
@@ -184,7 +184,7 @@ public class ProfileActivity extends Fragment {
                 holder.job.setText(mDataset.getJSONObject(position).getString("name"));
                 holder.detail.setText(mDataset.getJSONObject(position).getString("detail"));
                 holder.price.setText(mDataset.getJSONObject(position).getString("price"));
-                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'00:00:00.000'Z'");
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
                 Date date = simpleDateFormat.parse(mDataset.getJSONObject(position).getString("date"));
                 SimpleDateFormat outputFormat = new SimpleDateFormat("dd/MM/yyyy");
                 holder.date.setText(outputFormat.format(date));
